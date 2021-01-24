@@ -3,8 +3,6 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/i2c/i2c.h"
-// #include <stdlib.h>
-#include <bitset>
 
 namespace esphome {
 namespace ltr390 {
@@ -57,11 +55,12 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     void update() override;
     float get_setup_priority() const override { return setup_priority::DATA; }
 
-    void set_light_sensor(sensor::Sensor *light_sensor) { light_sensor_ = light_sensor; }
-    void set_als_sensor(sensor::Sensor *als_sensor) { als_sensor_ = als_sensor; }
+    void set_wfac(float wfac) { this->wfac_ = wfac; }
 
-    void set_uvi_sensor(sensor::Sensor *uvi_sensor) { uvi_sensor_ = uvi_sensor; }
-    void set_uv_sensor(sensor::Sensor *uv_sensor) { uv_sensor_ = uv_sensor; }
+    void set_light_sensor(sensor::Sensor *light_sensor) { this->light_sensor_ = light_sensor; }
+    void set_als_sensor(sensor::Sensor *als_sensor) { this->als_sensor_ = als_sensor; }
+    void set_uvi_sensor(sensor::Sensor *uvi_sensor) { this->uvi_sensor_ = uvi_sensor; }
+    void set_uv_sensor(sensor::Sensor *uv_sensor) { this->uv_sensor_ = uv_sensor; }
 
   protected:
     bool enabled();
@@ -91,6 +90,8 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     i2c::I2CRegister *status_reg_;
     i2c::I2CRegister *gain_reg_;
     i2c::I2CRegister *res_reg_;
+
+    float wfac_;
 
     sensor::Sensor *light_sensor_{nullptr};
     sensor::Sensor *als_sensor_{nullptr};

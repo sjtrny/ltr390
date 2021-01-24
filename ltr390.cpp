@@ -1,6 +1,6 @@
 #include "ltr390.h"
 #include "esphome/core/log.h"
-
+#include <bitset>
 
 namespace esphome {
 namespace ltr390 {
@@ -134,16 +134,12 @@ void LTR390Component::dump_config() {
 
 void LTR390Component::update() {
 
-
-      uint32_t wfac = 1;
-
       if (this->light_sensor_ != nullptr ||  this->als_sensor_ != nullptr) {
 
         uint32_t als = this->read_sensor_data(LTR390_MODE_ALS);
 
         if (this->light_sensor_ != nullptr) {
-
-          float lux = (0.6 * als) / (this->gain_values_[LTR390_GAIN_3] * this->resolution_values_[LTR390_RESOLUTION_18BIT]) * wfac;
+          float lux = (0.6 * als) / (this->gain_values_[LTR390_GAIN_3] * this->resolution_values_[LTR390_RESOLUTION_18BIT]) * this->wfac_;
           this->light_sensor_->publish_state(lux);
         }
 
@@ -157,7 +153,7 @@ void LTR390Component::update() {
         uint32_t uv = this->read_sensor_data(LTR390_MODE_UVS);
 
         if (this->uvi_sensor_ != nullptr) {
-          this->uvi_sensor_->publish_state(uv/LTR390_SENSITIVITY * wfac);
+          this->uvi_sensor_->publish_state(uv/LTR390_SENSITIVITY * this->wfac_);
         }
 
         if (this->uv_sensor_ != nullptr) {

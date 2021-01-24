@@ -13,6 +13,7 @@ CONF_LIGHT = 'light'
 CONF_ALS = 'als'
 CONF_UVI = 'uvi'
 CONF_UV = 'uv'
+CONF_WFAC = 'wfac'
 
 UNIT_COUNTS = '#'
 UNIT_UVI = 'UVI'
@@ -23,8 +24,10 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_LIGHT): sensor.sensor_schema(UNIT_LUX, ICON_BRIGHTNESS_5, 1),
     cv.Optional(CONF_ALS): sensor.sensor_schema(UNIT_COUNTS, ICON_BRIGHTNESS_5, 1),
 
-    cv.Optional(CONF_UVI): sensor.sensor_schema(UNIT_UVI, ICON_BRIGHTNESS_5, 1),
+    cv.Optional(CONF_UVI): sensor.sensor_schema(UNIT_UVI, ICON_BRIGHTNESS_5, 5),
     cv.Optional(CONF_UV): sensor.sensor_schema(UNIT_COUNTS, ICON_BRIGHTNESS_5, 1),
+
+    cv.Optional(CONF_WFAC, default=1.0): cv.float_range(min=1.0),
 
 }).extend(cv.polling_component_schema('60s')).extend(i2c.i2c_device_schema(0x53))
 
@@ -39,6 +42,8 @@ def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     yield i2c.register_i2c_device(var, config)
+
+    cg.add(var.set_wfac(config[CONF_WFAC]))
 
     for key, funcName in TYPES.items():
 

@@ -24,10 +24,11 @@ sensor:
 ## Available Sensors
 
 
-## Parameters
+## Optional Parameters
 
-- `address`: The I2C address of the device. Default is `0x53`
-- `update_interval`: How frequently to poll the device. Default is `60s`
+- `wfac`: Window correction factor. Use larger values when using under tinted windows. Default is 1.0, must be >= 1.0.
+- `address`: The I2C address of the device. Default is `0x53`.
+- `update_interval`: How frequently to poll the device. Default is `60s`.
 
 ## Complete configuration
 
