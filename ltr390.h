@@ -22,8 +22,8 @@ typedef enum {
 #define LTR390_GAIN 0x05            ///< ALS and UVS gain range
 #define LTR390_PART_ID 0x06         ///< Part id/revision register
 #define LTR390_MAIN_STATUS 0x07     ///< Main status register
-#define LTR390_ALSDATA 0x0D         ///< ALS data lowest byte
-#define LTR390_UVSDATA 0x10         ///< UVS data lowest byte
+
+#define LTR390_SENSITIVITY 2300.0
 
 // Sensing modes
 typedef enum {
@@ -57,7 +57,10 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     void update() override;
     float get_setup_priority() const override { return setup_priority::DATA; }
 
+    void set_light_sensor(sensor::Sensor *light_sensor) { light_sensor_ = light_sensor; }
     void set_als_sensor(sensor::Sensor *als_sensor) { als_sensor_ = als_sensor; }
+
+    void set_uvi_sensor(sensor::Sensor *uvi_sensor) { uvi_sensor_ = uvi_sensor; }
     void set_uv_sensor(sensor::Sensor *uv_sensor) { uv_sensor_ = uv_sensor; }
 
   protected:
@@ -76,15 +79,23 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     ltr390_resolution_t get_resolution(void);
 
     bool new_data_available(void);
+    uint32_t read_sensor_data(ltr390_mode_t mode);
     uint32_t read_uvs(void);
     uint32_t read_als(void);
+
+    float gain_values_[5] = {1.0, 3.0, 6.0, 9.0, 18.0};
+    float resolution_values_[6] = {4.0, 2.0, 1.0, 0.5, 0.25, 0.125};
+    uint32_t mode_addresses_[2] = {0x0D, 0x10};
 
     i2c::I2CRegister *ctrl_reg_;
     i2c::I2CRegister *status_reg_;
     i2c::I2CRegister *gain_reg_;
     i2c::I2CRegister *res_reg_;
 
+    sensor::Sensor *light_sensor_{nullptr};
     sensor::Sensor *als_sensor_{nullptr};
+
+    sensor::Sensor *uvi_sensor_{nullptr};
     sensor::Sensor *uv_sensor_{nullptr};
 
 };
