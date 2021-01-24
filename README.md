@@ -23,9 +23,15 @@ sensor:
 
 ## Available Sensors
 
+- `light`: calculated lux (lx)
+- `als`: raw light sensor count (#)
+- `uvi`: calculated UV Index (UVI)
+- `uv`: raw UV sensor count (#)
 
 ## Optional Parameters
 
+- `gain`: . Default is ``"X3"``.
+- `resolution`: . Default is `18`.
 - `wfac`: Window correction factor. Use larger values when using under tinted windows. Default is 1.0, must be >= 1.0.
 - `address`: The I2C address of the device. Default is `0x53`.
 - `update_interval`: How frequently to poll the device. Default is `60s`.
@@ -33,15 +39,39 @@ sensor:
 ## Complete configuration
 
 ```
-  - platform: ltr390
-    address: 0x12
-    update_interval: 60s
+- platform: ltr390
+  light:
+    name: "LTR390 Light"
+  als:
+    name: "LTR390 ALS Count"
+  uvi:
+    name: "LTR390 UVI"
+  uv:
+    name: "LTR390 UV"
+  gain: "X3"
+  resolution: 18
+  wfac: 1
+  address: 0x53
+  update_interval: 60s
 
 ```
 
+## Lux and UVI Formulas
+
+<img src="https://latex.codecogs.com/gif.latex?\text{lux}&space;=&space;\frac{0.6&space;\times&space;\text{als}}{\text{gain}&space;\times&space;\text{int}}&space;\times&space;\text{wfac}" />
+
+<img src="https://latex.codecogs.com/gif.latex?\text{UVI}&space;=&space;\frac{\text{uv}}{\text{sensitivity}}&space;\times&space;\text{wfac}" />
+
+where:
+- `als` and `uv` are the sensor values
+- `gain` is the amount of gain, see the table below for details
+- `int` is the integration time in 100s of ms and is tied to the resolution, see the table below for details
+- `sensitivity` has the value `2300` and is the sensor's count per UVI
+- `wfac` is the window correction factor
+
 ## Datasheet
 
-English datasheet https://optoelectronics.liteon.com/upload/download/DS86-2015-0004/LTR-390UV_Final_%20DS_V1%201.pdf
+[English datasheet](https://optoelectronics.liteon.com/upload/download/DS86-2015-0004/LTR-390UV_Final_%20DS_V1%201.pdf)
 
 ## Hardware
 

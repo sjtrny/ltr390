@@ -126,6 +126,17 @@ void LTR390Component::setup() {
     this->mark_failed();
     return;
   }
+
+  // Set gain
+  ESP_LOGD(TAG, "Gain: %i", this->get_gain());
+  this->set_gain(this->gain_);
+  ESP_LOGD(TAG, "Gain: %i", this->get_gain());
+
+  // Set resolution
+  ESP_LOGD(TAG, "Res: %i", this->get_resolution());
+  this->set_resolution(this->res_);
+  ESP_LOGD(TAG, "Res: %i", this->get_resolution());
+
 }
 
 void LTR390Component::dump_config() {
@@ -139,7 +150,7 @@ void LTR390Component::update() {
         uint32_t als = this->read_sensor_data(LTR390_MODE_ALS);
 
         if (this->light_sensor_ != nullptr) {
-          float lux = (0.6 * als) / (this->gain_values_[LTR390_GAIN_3] * this->resolution_values_[LTR390_RESOLUTION_18BIT]) * this->wfac_;
+          float lux = (0.6 * als) / (this->gain_values_[this->gain_] * this->resolution_values_[LTR390_RESOLUTION_18BIT]) * this->wfac_;
           this->light_sensor_->publish_state(lux);
         }
 

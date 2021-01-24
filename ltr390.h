@@ -55,7 +55,9 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     void update() override;
     float get_setup_priority() const override { return setup_priority::DATA; }
 
-    void set_wfac(float wfac) { this->wfac_ = wfac; }
+    void set_gain_value(ltr390_gain_t gain) { this->gain_ = gain; }
+    void set_res_value(ltr390_resolution_t res) { this->res_ = res; }
+    void set_wfac_value(float wfac) { this->wfac_ = wfac; }
 
     void set_light_sensor(sensor::Sensor *light_sensor) { this->light_sensor_ = light_sensor; }
     void set_als_sensor(sensor::Sensor *als_sensor) { this->als_sensor_ = als_sensor; }
@@ -91,6 +93,8 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
     i2c::I2CRegister *gain_reg_;
     i2c::I2CRegister *res_reg_;
 
+    ltr390_gain_t gain_;
+    ltr390_resolution_t res_;
     float wfac_;
 
     sensor::Sensor *light_sensor_{nullptr};
