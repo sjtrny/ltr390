@@ -128,15 +128,10 @@ void LTR390Component::setup() {
   }
 
   // Set gain
-  ESP_LOGD(TAG, "Gain: %i", this->get_gain());
   this->set_gain(this->gain_);
-  ESP_LOGD(TAG, "Gain: %i", this->get_gain());
 
   // Set resolution
-  ESP_LOGD(TAG, "Res: %i", this->get_resolution());
   this->set_resolution(this->res_);
-  ESP_LOGD(TAG, "Res: %i", this->get_resolution());
-
 }
 
 void LTR390Component::dump_config() {
