@@ -137,8 +137,12 @@ void LTR390Component::dump_config() {
 
 void LTR390Component::update() {
     if (this->new_data_available()) {
-      this->als_sensor_->publish_state(this->read_als());
-      this->uv_sensor_->publish_state(this->read_uvs());
+      if (this->als_sensor_ != nullptr) {
+        this->als_sensor_->publish_state(this->read_als());
+      }
+      if (this->uv_sensor_ != nullptr) {
+        this->uv_sensor_->publish_state(this->read_uvs());
+      }
     }
 }
 

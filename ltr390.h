@@ -25,23 +25,26 @@ typedef enum {
 #define LTR390_ALSDATA 0x0D         ///< ALS data lowest byte
 #define LTR390_UVSDATA 0x10         ///< UVS data lowest byte
 
+// Sensing modes
 typedef enum {
   LTR390_MODE_ALS,
   LTR390_MODE_UVS,
 } ltr390_mode_t;
 
+// Sensor gain levels
 typedef enum {
   LTR390_GAIN_1 = 0,
-  LTR390_GAIN_3,
+  LTR390_GAIN_3, // Default
   LTR390_GAIN_6,
   LTR390_GAIN_9,
   LTR390_GAIN_18,
 } ltr390_gain_t;
 
+// Sensor resolution
 typedef enum {
   LTR390_RESOLUTION_20BIT,
   LTR390_RESOLUTION_19BIT,
-  LTR390_RESOLUTION_18BIT,
+  LTR390_RESOLUTION_18BIT, // Default
   LTR390_RESOLUTION_17BIT,
   LTR390_RESOLUTION_16BIT,
   LTR390_RESOLUTION_13BIT,
