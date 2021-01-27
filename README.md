@@ -34,7 +34,7 @@ sensor:
 - `resolution`: . Default is `18`.
 - `wfac`: Window correction factor. Use larger values when using under tinted windows. Default is 1.0, must be >= 1.0.
 - `address`: The I2C address of the device. Default is `0x53`.
-- `update_interval`: How frequently to poll the device. Default is `60s`.
+- `update_interval`: How frequently to poll the device. It is recommended that the update interval is at least 1 second since updates can take up to 800ms when using a high resolution value. Default is `60s`.
 
 ## Complete configuration
 
@@ -68,6 +68,25 @@ where:
 - `int` is the integration time in 100s of ms and is tied to the resolution, see the table below for details
 - `sensitivity` has the value `2300` and is the sensor's count per UVI
 - `wfac` is the window correction factor
+
+
+| Gain Parameter | gain       |
+|----------------|------------|
+| X1             | 1          |
+| X3             | 3          |
+| X6             | 6          |
+| X9             | 9          |
+| X18            | 18         |
+
+
+| Resolution (bits) | Integration Time (ms) | int  |
+|-------------------|-----------------------|------|
+| 16                | 25                    | 0.25 |
+| 17                | 50                    | 0.5  |
+| 18                | 100                   | 1    |
+| 19                | 200                   | 2    |
+| 20                | 400                   | 4    |
+
 
 ## Datasheet
 
