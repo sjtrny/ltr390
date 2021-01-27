@@ -2,10 +2,15 @@
 #include "esphome/core/log.h"
 #include <bitset>
 
+
 namespace esphome {
 namespace ltr390 {
 
 static const char *TAG = "ltr390";
+
+static const float gain_values_[5] = {1.0, 3.0, 6.0, 9.0, 18.0};
+static const float resolution_values_[6] = {4.0, 2.0, 1.0, 0.5, 0.25, 0.125};
+static const uint32_t mode_addresses_[2] = {0x0D, 0x10};
 
 bool LTR390Component::enabled(void) {
   std::bitset<8> crtl_value (this->ctrl_reg_->get());
@@ -82,7 +87,7 @@ bool LTR390Component::new_data_available(void) {
   return (bool)status_value[3];
 }
 
-uint32_t bytes_to_int(uint8_t *buffer, uint8_t num_bytes) {
+uint32_t little_endian_bytes_to_int(uint8_t *buffer, uint8_t num_bytes) {
   uint32_t value = 0;
 
   for (int i = 0; i < num_bytes; i++) {
@@ -94,23 +99,22 @@ uint32_t bytes_to_int(uint8_t *buffer, uint8_t num_bytes) {
 }
 
 uint32_t LTR390Component::read_sensor_data(ltr390_mode_t mode) {
-
-  this->set_mode(mode);
-
-  delay(this->resolution_values_[LTR390_RESOLUTION_18BIT] * 100);
-  while (!this->new_data_available()) {
-    delay(this->resolution_values_[LTR390_RESOLUTION_18BIT] * 100);
-  }
-
   const uint8_t num_bytes = 3;
   uint8_t buffer[num_bytes];
 
-  this->read_bytes(this->mode_addresses_[mode], buffer, num_bytes);
+  while (!this->new_data_available()) {
+    ESP_LOGD(TAG, "WAITING FOR DATA");
+    delay(2);
+  }
 
-  return bytes_to_int(buffer, num_bytes);
+  this->read_bytes(mode_addresses_[mode], buffer, num_bytes);
+
+  return little_endian_bytes_to_int(buffer, num_bytes);
 }
 
 void LTR390Component::setup() {
+
+
   ESP_LOGCONFIG(TAG, "Setting up ltr390...");
 
   this->ctrl_reg_ = new i2c::I2CRegister(this, LTR390_MAIN_CTRL);
@@ -132,41 +136,78 @@ void LTR390Component::setup() {
 
   // Set resolution
   this->set_resolution(this->res_);
+
+  this->reading = false;
+
+  this->mode_funcs_ = new std::vector<std::tuple<ltr390_mode_t, std::function<void(void)> > >();
+
+  if (this->light_sensor_ != nullptr || this->als_sensor_ != nullptr) {
+    this->mode_funcs_->push_back(std::make_tuple(LTR390_MODE_ALS, std::bind(&LTR390Component::read_als, this)));
+  }
+
+  if (this->uvi_sensor_ != nullptr || this->uv_sensor_ != nullptr) {
+    this->mode_funcs_->push_back(std::make_tuple(LTR390_MODE_UVS, std::bind(&LTR390Component::read_uvs, this)));
+  }
+
 }
 
 void LTR390Component::dump_config() {
     LOG_I2C_DEVICE(this);
 }
 
+void LTR390Component::read_als() {
+  uint32_t als = this->read_sensor_data(LTR390_MODE_ALS);
+
+  if (this->light_sensor_ != nullptr) {
+    float lux = (0.6 * als) / (gain_values_[this->gain_] * resolution_values_[this->res_]) * this->wfac_;
+    this->light_sensor_->publish_state(lux);
+  }
+
+  if (this->als_sensor_ != nullptr) {
+    this->als_sensor_->publish_state(als);
+  }
+
+}
+
+void LTR390Component::read_uvs() {
+  uint32_t uv = this->read_sensor_data(LTR390_MODE_UVS);
+
+  if (this->uvi_sensor_ != nullptr) {
+    this->uvi_sensor_->publish_state(uv/LTR390_SENSITIVITY * this->wfac_);
+  }
+
+  if (this->uv_sensor_ != nullptr) {
+    this->uv_sensor_->publish_state(uv);
+  }
+}
+
+
+void LTR390Component::read_mode(int mode_index) {
+
+  // Set mode
+  this->set_mode(std::get<0>(this->mode_funcs_->at(mode_index)));
+
+  this->set_timeout(resolution_values_[this->res_] * 100, [this, mode_index]() {
+    // Call read function
+    std::get<1>(this->mode_funcs_->at(mode_index))();
+
+    if (mode_index + 1 < this->mode_funcs_->size()) {
+        this->read_mode(mode_index + 1);
+    } else {
+      this->reading = false;
+    }
+  });
+
+}
+
 void LTR390Component::update() {
 
-      if (this->light_sensor_ != nullptr ||  this->als_sensor_ != nullptr) {
+  if (!this->reading) {
+    this->reading = true;
+    this->read_mode(0);
+  } else {
+  }
 
-        uint32_t als = this->read_sensor_data(LTR390_MODE_ALS);
-
-        if (this->light_sensor_ != nullptr) {
-          float lux = (0.6 * als) / (this->gain_values_[this->gain_] * this->resolution_values_[LTR390_RESOLUTION_18BIT]) * this->wfac_;
-          this->light_sensor_->publish_state(lux);
-        }
-
-        if (this->als_sensor_ != nullptr) {
-          this->als_sensor_->publish_state(als);
-        }
-      }
-
-      if (this->uvi_sensor_ != nullptr || this->uv_sensor_ != nullptr) {
-
-        uint32_t uv = this->read_sensor_data(LTR390_MODE_UVS);
-
-        if (this->uvi_sensor_ != nullptr) {
-          this->uvi_sensor_->publish_state(uv/LTR390_SENSITIVITY * this->wfac_);
-        }
-
-        if (this->uv_sensor_ != nullptr) {
-          this->uv_sensor_->publish_state(uv);
-        }
-
-      }
 }
 
 }  // namespace ltr390

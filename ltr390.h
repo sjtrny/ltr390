@@ -3,6 +3,9 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/i2c/i2c.h"
+#include <map>
+#include <atomic>
+#include <tuple>
 
 namespace esphome {
 namespace ltr390 {
@@ -81,12 +84,16 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
 
     bool new_data_available(void);
     uint32_t read_sensor_data(ltr390_mode_t mode);
-    uint32_t read_uvs(void);
-    uint32_t read_als(void);
 
-    float gain_values_[5] = {1.0, 3.0, 6.0, 9.0, 18.0};
-    float resolution_values_[6] = {4.0, 2.0, 1.0, 0.5, 0.25, 0.125};
-    uint32_t mode_addresses_[2] = {0x0D, 0x10};
+    void read_als(void);
+    void read_uvs(void);
+
+    void read_mode(int mode_index);
+
+    std::atomic<bool> reading;
+
+
+    std::vector< std::tuple< ltr390_mode_t, std::function<void(void)> > > *mode_funcs_;
 
     i2c::I2CRegister *ctrl_reg_;
     i2c::I2CRegister *status_reg_;
