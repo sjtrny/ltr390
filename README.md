@@ -30,8 +30,8 @@ sensor:
 
 ## Optional Parameters
 
-- `gain`: . Default is ``"X3"``.
-- `resolution`: . Default is `18`.
+- `gain`: Adjusts the sensitivity of the sensor. A larger value means higher sensitivity. See table below for details. Default is ``"X3"``.
+- `resolution`: ADC resolution. Higher resolutions require longer sensor integration times. See table below for details. Default is `18`.
 - `wfac`: Window correction factor. Use larger values when using under tinted windows. Default is 1.0, must be >= 1.0.
 - `address`: The I2C address of the device. Default is `0x53`.
 - `update_interval`: How frequently to poll the device. It is recommended that the update interval is at least 1 second since updates can take up to 800ms when using a high resolution value. Default is `60s`.
