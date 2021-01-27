@@ -137,14 +137,18 @@ void LTR390Component::setup() {
   // Set resolution
   this->set_resolution(this->res_);
 
+  // Set sensor read state
   this->reading = false;
 
+  // Create a list of modes and corresponding read functions
   this->mode_funcs_ = new std::vector<std::tuple<ltr390_mode_t, std::function<void(void)> > >();
 
+  // If we need the light sensor then add to the list
   if (this->light_sensor_ != nullptr || this->als_sensor_ != nullptr) {
     this->mode_funcs_->push_back(std::make_tuple(LTR390_MODE_ALS, std::bind(&LTR390Component::read_als, this)));
   }
 
+  // If we need the UV sensor then add to the list
   if (this->uvi_sensor_ != nullptr || this->uv_sensor_ != nullptr) {
     this->mode_funcs_->push_back(std::make_tuple(LTR390_MODE_UVS, std::bind(&LTR390Component::read_uvs, this)));
   }
@@ -187,10 +191,13 @@ void LTR390Component::read_mode(int mode_index) {
   // Set mode
   this->set_mode(std::get<0>(this->mode_funcs_->at(mode_index)));
 
+  // After the sensor integration time do the following
   this->set_timeout(resolution_values_[this->res_] * 100, [this, mode_index]() {
-    // Call read function
+    // Read from the sensor
     std::get<1>(this->mode_funcs_->at(mode_index))();
 
+    // If there are more modes to read then begin the next
+    // otherwise stop
     if (mode_index + 1 < this->mode_funcs_->size()) {
         this->read_mode(mode_index + 1);
     } else {
@@ -205,7 +212,6 @@ void LTR390Component::update() {
   if (!this->reading) {
     this->reading = true;
     this->read_mode(0);
-  } else {
   }
 
 }

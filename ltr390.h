@@ -92,7 +92,6 @@ class LTR390Component : public PollingComponent, public i2c::I2CDevice {
 
     std::atomic<bool> reading;
 
-
     std::vector< std::tuple< ltr390_mode_t, std::function<void(void)> > > *mode_funcs_;
 
     i2c::I2CRegister *ctrl_reg_;
