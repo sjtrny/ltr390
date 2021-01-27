@@ -69,8 +69,7 @@ where:
 - `sensitivity` has the value `2300` and is the sensor's count per UVI
 - `wfac` is the window correction factor
 
-<table style="border: none;">
-
+<table>
 <tr><td>
 
 | Gain Parameter | gain       |
@@ -92,7 +91,6 @@ where:
 | 20                | 400                   | 4    |
 
 </td></tr>
-
 </table>
 
 ## Datasheet
