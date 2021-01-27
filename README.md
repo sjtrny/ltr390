@@ -72,6 +72,7 @@ where:
 <table>
 
 <tr><td>
+
 | Gain Parameter | gain       |
 |----------------|------------|
 | X1             | 1          |
