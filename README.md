@@ -69,7 +69,9 @@ where:
 - `sensitivity` has the value `2300` and is the sensor's count per UVI
 - `wfac` is the window correction factor
 
+<table>
 
+<tr><td>
 | Gain Parameter | gain       |
 |----------------|------------|
 | X1             | 1          |
@@ -78,6 +80,7 @@ where:
 | X9             | 9          |
 | X18            | 18         |
 
+</td><td>
 
 | Resolution (bits) | Integration Time (ms) | int  |
 |-------------------|-----------------------|------|
@@ -87,6 +90,9 @@ where:
 | 19                | 200                   | 2    |
 | 20                | 400                   | 4    |
 
+</td></tr>
+
+</table>
 
 ## Datasheet
 
