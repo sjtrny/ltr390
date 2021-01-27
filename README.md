@@ -69,7 +69,7 @@ where:
 - `sensitivity` has the value `2300` and is the sensor's count per UVI
 - `wfac` is the window correction factor
 
-<table>
+<table style="border:0px">
 
 <tr><td>
 
